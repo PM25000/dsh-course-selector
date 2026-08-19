@@ -1,0 +1,19 @@
+{
+  // Standalone config consumed by tsdown's rolldown build (and editors). The
+  // strict repo typecheck runs under tsconfig.typecheck.json (extends the
+  // repo base + built-artifact paths), which tsdown cannot parse.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src"
+  ]
+}

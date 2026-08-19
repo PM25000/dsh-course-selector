@@ -1,0 +1,15 @@
+# dsh-course-selector bundle patch — installs the course-selector plugin as one
+# more row over the active profile. Install with:
+#   dsh plugin --profile <name> add ./course-selector-assistant
+# then boot the profile (web profile: restart applies it).
+#
+# Client half: this package declares `dsh.client` (platform: web), so the
+# profile's client-modules roster picks up lib/client.js once built.
+- insert:
+    - id: course-selector
+      name: dsh-course-selector
+      config:
+        engine: auto
+        windowVisibility: visible
+        targetOrigin: https://zdbk.zju.edu.cn
+        verbose: false

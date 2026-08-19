@@ -1,0 +1,22 @@
+{
+  "extends": "G:/deepseek-harness/tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    "incremental": false,
+    "declaration": false,
+    "sourceMap": false,
+    "declarationMap": false,
+    // Consumers type-check against the repo's BUILT type outputs (artifact
+    // plane), not vendored/package sources: skipLibCheck then suppresses
+    // internals, and the harness runtime supplies the packages at load time.
+    "paths": {
+      "@deepseek-ai/cordis": ["G:/deepseek-harness/vendor/cordis"],
+      "@deepseek-ai/schemastery": ["G:/deepseek-harness/vendor/schemastery"],
+      "@deepseek-ai/dsh-tools": ["G:/deepseek-harness/packages/core/tools"],
+      "@deepseek-ai/dsh-host-webserver": ["G:/deepseek-harness/packages/host/webserver"]
+    },
+    "types": ["node"]
+  },
+  "include": ["src/node/**/*.ts"]
+}
