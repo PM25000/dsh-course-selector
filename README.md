@@ -1,5 +1,12 @@
 # dsh-course-selector · 浙江大学选课助手
 
+<p>
+  <img src="https://img.shields.io/badge/dsh-bundle-4B32C3?logo=deepseek" alt="dsh bundle">
+  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT">
+  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey.svg" alt="Windows | macOS">
+  <img src="https://img.shields.io/badge/status-early%20access-yellow.svg" alt="early access">
+</p>
+
 > 目标系统：浙江大学本科教学管理信息服务平台 `https://zdbk.zju.edu.cn/jwglxt/`（**正方**实现，页面底部有"技术支持：正方软件股份有限公司"）。
 > 定位：正常选课、无延迟要求；不设计抢课/并发机制（浙大志愿制随机筛选，无需抢序）。
 > 架构与决策详见 [`DESIGN.md`](DESIGN.md)；浏览器实现参考社区 [`anweat/dsh-browser`](https://github.com/anweat/dsh-browser)、[`xylt369/dsh-browser`](https://github.com/xylt369/dsh-browser) 与 [`Lum1104/dsh-browser`](https://github.com/Lum1104/dsh-browser)。
@@ -136,3 +143,13 @@ dsh --profile web   # web profile 关闭 HMR，装完需重启
 - 快照对敏感输入掩码；登录凭据不落盘（浏览器 profile 原生保存）。
 - 浏览器 evaluate 不暴露为模型工具；开发用的 click/dim/digest 端点仅宿主内部、只在目标站点触发。
 - Playwright 产物与截图落在 `$DSH_HOME/data/course-selector/`，便于清理。
+
+---
+
+## Contributing
+
+欢迎贡献。请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)：遵守合规（不做抢课/刷课）、URL 门控、权限门，跑通 `npm run typecheck && npm run build`。
+
+## License
+
+[MIT](LICENSE) © dsh-course-selector contributors
