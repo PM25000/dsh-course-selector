@@ -190,7 +190,7 @@ export function registerBrowserTools(ctx: Context, service: BrowserManager, rc?:
     name: 'browser_crawl',
     description: '遍历当前课程类别全部课程：逐门展开折叠课程的教学班并自动翻页；每次展开后先注入 ⭐评分/难度再读 DOM，返回每行 {course, teacher, score, difficulty, time, location}。不做任何过滤——筛选是调用方的事。',
     parameters: {
-      max_pages: { type: 'number', description: '可选。最多翻页数（默认 4），仅作性能护栏。' },
+      max_pages: { type: 'number', description: '可选。最多翻页数（默认翻到底，直到无「点此查看更多」），仅作性能护栏。' },
     },
     output: { schema: {
       type: 'object', additionalProperties: false,
@@ -212,7 +212,7 @@ export function registerBrowserTools(ctx: Context, service: BrowserManager, rc?:
     timeoutMs: 240_000,
     isConcurrencySafe: () => false,
     async execute(args) {
-      const maxPages = Number.isFinite(Number(args.max_pages)) ? Math.max(1, Math.floor(Number(args.max_pages))) : 4
+      const maxPages = Number.isFinite(Number(args.max_pages)) ? Math.max(1, Math.floor(Number(args.max_pages))) : Infinity
       let map: Record<string, string> = {}
       if (rc) {
         try { await rc.ratings.dataset(rc.baseUrl()) } catch { /* 无评分数据不影响遍历 */ }

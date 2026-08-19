@@ -1194,14 +1194,15 @@ export class BrowserManager {
 
   /** 逐课程遍历当前类别：展开→（先注入评分/难度）→读表→翻页，汇总全部教学班
    *  （列对齐结构，供 course_plan/course_search/adapter 使用）。 */
-  async crawlGrid(map?: Record<string, string>, hrefMap: Record<string, string> = {}, maxPages = 4): Promise<Array<{ course: string; headers: string[]; rows: string[][] }>> {
+  async crawlGrid(map?: Record<string, string>, hrefMap: Record<string, string> = {}, maxPages = Infinity): Promise<Array<{ course: string; headers: string[]; rows: string[][] }>> {
     const out: Array<{ course: string; headers: string[]; rows: string[][] }> = []
     const seenCards = new Set<string>()
     const seenTables = new Set<string>()
     let pagesSeen = 0
     for (let guard = 0; guard < 200; guard++) {
       const cards = await this.listCards()
-      const fresh = cards.filter((c) => !seenCards.has(c.id) && !c.expanded)
+      // 同 crawlGridSem：不跳过已展开卡（单卡命中时首卡已自动展开，跳过即漏）。
+      const fresh = cards.filter((c) => !seenCards.has(c.id))
       if (fresh.length === 0) {
         if (pagesSeen >= maxPages) break
         const more = await this.nextPage()
@@ -1231,14 +1232,17 @@ export class BrowserManager {
   /** 同 crawlGrid，但每行按 DOM 语义读取（不靠列索引，表型无关）：
    *  教师=行内 <a>，节次/地点/余量=行内特征——分类页/搜索页/大班次通用。
    *  供 browser_crawl 使用。 */
-  async crawlGridSem(map?: Record<string, string>, hrefMap: Record<string, string> = {}, maxPages = 4): Promise<Array<{ course: string; rows: RowSem[] }>> {
+  async crawlGridSem(map?: Record<string, string>, hrefMap: Record<string, string> = {}, maxPages = Infinity): Promise<Array<{ course: string; rows: RowSem[] }>> {
     const out: Array<{ course: string; rows: RowSem[] }> = []
     const seenCards = new Set<string>()
     const seenTables = new Set<string>()
     let pagesSeen = 0
     for (let guard = 0; guard < 200; guard++) {
       const cards = await this.listCards()
-      const fresh = cards.filter((c) => !seenCards.has(c.id) && !c.expanded)
+      // 不跳过已展开的卡：搜索引擎/单卡命中时第一张卡可能已自动展开（手风琴，
+      // 只有 1 张卡时没有"轮换"机会），`!c.expanded` 过滤会把它漏掉导致返回空。
+      // expandCard 对已展开卡是安全空操作（只点折叠态的 expand1 链接），直接读表即可。
+      const fresh = cards.filter((c) => !seenCards.has(c.id))
       if (fresh.length === 0) {
         if (pagesSeen >= maxPages) break
         const more = await this.nextPage()
@@ -1289,12 +1293,14 @@ export class BrowserManager {
             if (!teacher) return
             const cells = arrOf(tr)
             const time = cells.find((c) => /周[一二三四五六日]|星期[一二三四五六日]/.test(c)) || ''
-            // 地点特征：含场馆/教室类地名词；排除教师/评分格（⭐★/纯评分）与节次格。
+            // 地点特征：含场馆/教室类地名词；排除教师/评分格（⭐★）、节次格、
+            // 面向对象格（「会游泳/需会游泳」等课程要求——含地名词但非地点）。
             const location = cells.find((c) =>
-              /校区|体育馆|体育场|球场|场地|操场|游泳|田径|健身|教室|实验室|机房|室|馆|楼|中心|基地/.test(c)
+              /校区|体育馆|体育场|球场|场地|操场|田径|健身|教室|实验室|机房|馆|中心|基地|楼/.test(c)
               && !/⭐|★/.test(c)
               && !/周[一二三四五六日]|第\d/.test(c)
               && !/^\s*-?\d+\s*\/\s*\d+\s*$/.test(c)
+              && !/会游泳|需会游泳|必须会游泳|游泳能力/.test(c)
             ) || ''
             const restCell = cells.find((c) => /^\s*-?\d+\s*\/\s*\d+\s*$/.test(c))
             const restM = restCell ? /(-?\d+)\s*\/\s*\d+/.exec(restCell) : null
